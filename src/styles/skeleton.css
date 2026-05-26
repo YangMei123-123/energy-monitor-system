@@ -1,0 +1,110 @@
+/**
+ * ================================================================
+ * 骨架屏全局样式 — 叠加层模式
+ *
+ * 核心设计原则（针对 Lighthouse Speed Index 优化）：
+ * 1. 零动画：纯静态色块，不使用 shimmer/gradient/pulse 等任何动画
+ * 2. 叠加层：骨架与真实内容同时存在于 DOM 中，仅通过 opacity 切换
+ * 3. 不重建 DOM：使用 position:absolute 叠加 + CSS opacity 过渡
+ *
+ * 用法：
+ *   <div class="skel-wrapper" :class="{ 'skel-loaded': !loading }">
+ *     <div class="skel-overlay">...</div>   ← 骨架层
+ *     <div class="skel-content">...</div>  ← 真实内容
+ *   </div>
+ *
+ * 之前 91→73 的教训回顾：
+ *   - shimmer 动画 → 每帧视觉不同 → SI 算法扣分
+ *   - v-if/v-else → DOM 销毁重建 → 检测为大幅布局变化
+ * ================================================================ */
+
+/* ===== 包裹容器 ===== */
+.skel-wrapper {
+  position: relative;
+}
+
+/* ===== 真实内容层：加载中低透明度 ===== */
+.skel-content {
+  transition: opacity 0.25s ease-out;
+}
+
+.skel-wrapper:not(.skel-loaded) .skel-content {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.skel-wrapper.skel-loaded .skel-content {
+  opacity: 1;
+}
+
+/* ===== 骨架叠加层：position:absolute 浮在内容之上 ===== */
+.skel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+}
+
+.skel-wrapper:not(.skel-loaded) .skel-overlay {
+  opacity: 1;
+}
+
+.skel-wrapper.skel-loaded .skel-overlay {
+  opacity: 0;
+}
+
+/* ===== 基础骨架块（静态色块，无动画） ===== */
+.skel-block {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+.skel-circle {
+  background: var(--color-bg-tertiary);
+  border-radius: 50%;
+}
+
+.skel-line {
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+/* ===== 常用尺寸预设 ===== */
+.skel-line-sm  { height: 12px; }
+.skel-line-md  { height: 16px; }
+.skel-line-lg  { height: 20px; }
+.skel-line-xl  { height: 28px; }
+
+.skel-icon-sm { width: 32px; height: 32px; }
+.skel-icon-md { width: 40px; height: 40px; }
+.skel-icon-lg { width: 48px; height: 48px; }
+
+/* ===== 卡片骨架 ===== */
+.skel-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* ===== 图表骨架 ===== */
+.skel-chart {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+}
+
+.skel-chart-header {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skel-chart-body {
+  border-radius: var(--radius-sm);
+}
